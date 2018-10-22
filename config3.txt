@@ -1,5 +1,5 @@
-192.168.0.1:6002
+localhost:6002
 Juca
 12
-true
+false
 6000

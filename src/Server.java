@@ -7,11 +7,19 @@ public class Server {
 
 	public Server(Configuration configuration) {
 		this.configuration = configuration;
-		System.out.println(configuration.getNickname());
-		sendMessageToClient("Olá");
-		System.out.println("Enviou");
-		lintenClients();
-		System.out.println("Recebeu");
+		new Thread(this::lintenClients)
+				.start();
+
+		new Thread(() -> {
+			try {
+				while (true) {
+					Thread.sleep(1000);
+					sendMessageToClient("ola " + configuration.getDebugPort());
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}).start();
 	}
 
 	public void lintenClients() {
