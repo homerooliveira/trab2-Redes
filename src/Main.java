@@ -1,6 +1,13 @@
+import java.io.IOException;
 
 public class Main {
 	public static void main(String[] args) {
-		System.out.println("Homerox");
+		try {
+			final Configuration config = ConfigurationReader.read("config.txt");
+			new Server(config);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
