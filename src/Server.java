@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.net.*;
+import java.util.Scanner;
 
 public class Server {
 
@@ -11,13 +12,10 @@ public class Server {
 				.start();
 
 		new Thread(() -> {
-			try {
-				while (true) {
-					Thread.sleep(1000);
-					sendMessageToClient("ola " + configuration.getDebugPort());
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			while (true) {
+				final Scanner scanner = new Scanner(System.in);
+				final String message = scanner.next();
+				sendMessageToClient(message);
 			}
 		}).start();
 	}
