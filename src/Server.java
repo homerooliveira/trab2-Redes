@@ -1,10 +1,14 @@
 import java.io.IOException;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
 public class Server {
 
 	private final Configuration configuration;
+	private final List<Message> messages = Collections.synchronizedList(new ArrayList<>());
 
 	public Server(Configuration configuration) {
 		this.configuration = configuration;
@@ -14,7 +18,7 @@ public class Server {
 		new Thread(() -> {
 			while (true) {
 				final Scanner scanner = new Scanner(System.in);
-				final String message = scanner.next();
+				final String message = scanner.nextLine();
 				sendMessageToClient(message);
 			}
 		}).start();
@@ -24,13 +28,19 @@ public class Server {
 		DatagramSocket serverSocket;
 		try {
 			serverSocket = new DatagramSocket(configuration.getDebugPort());
-			byte[] receiveData = new byte[1024];
+			final byte[] receiveData = new byte[1024];
 
 			while (true) {
-				DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+				final DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 				serverSocket.receive(receivePacket);
-				String receivedMessage = new String(receivePacket.getData(), 0, receivePacket.getLength());
-				System.out.println(receivedMessage);
+
+				final String receivedMessage = new String(
+						receivePacket.getData(),
+						receivePacket.getOffset(),
+						receivePacket.getLength());
+
+				final Message message = new Message(receivedMessage);
+				System.out.println(message.toString());
 			}
 		} catch (SocketException e) {
 			e.printStackTrace();
@@ -40,12 +50,13 @@ public class Server {
 	}
 
 
-	public void sendMessageToClient(String message) {
+	public void sendMessageToClient(String messageString) {
 		try {
 			try(DatagramSocket clientSocket = new DatagramSocket()) {
+				final Message message = new Message(messageString);
 				InetAddress address = InetAddress.getByName(configuration.getIpDestiny());
 
-				byte[] sendData = message.getBytes();
+				byte[] sendData = message.toString().getBytes();
 				DatagramPacket sendPacket = new DatagramPacket(
 						sendData,
 						sendData.length,
