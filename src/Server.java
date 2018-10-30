@@ -7,6 +7,10 @@ import java.util.Scanner;
 
 public class Server {
 
+	public static final String NAO_COPIADO = "naocopiado";
+	public static final String TODOS = "todos";
+	public static final String OK = "OK";
+	public static final String ERRO = "erro";
 	private final Configuration configuration;
 	private final List<Message> messages = Collections.synchronizedList(new ArrayList<>());
 
@@ -52,38 +56,40 @@ public class Server {
 					sendMessage();
 				} else {
 					final Message message = Message.from(receivedMessage);
-					if (message != null) {
-						System.out.println(message.toString());
+					if (message == null) {
+						continue;
+					}
+					System.out.println(message.toString());
 
-						if (message.getNicknameDestination().equals(configuration.getNickname())) {
-							printMessage(message);
-							message.setErrorControl("ok");
-							sendMessageToClient(message.toString());
-						} else if (message.getNicknameDestination().equals("todos")
-								&& !message.getNicknameSource().equals(configuration.getNickname())
-								&& message.getErrorControl().equals("naocopiado")) {
-							System.out.println("A mensagem voltou para mim");
-							printMessage(message);
-							sendMessageToClient(message.toString());
-						} else if(!message.getNicknameDestination().equals(configuration.getNickname())) {
-							System.out.println("Recebi não para mim");
-							System.out.println(message.toString());
-							sendMessageToClient(message.toString());
-						} else if (message.getErrorControl().equals("OK")
-								|| message.getErrorControl().equals("naocopiado")) {
-							System.out.println("Foi entregue");
-							sendToken();
-						} else if (message.getErrorControl().equals("erro")){
-							if (message.getRetryCount() > 0) {
-								System.out.println("Não foi possivel enviar a mensagem");
-							} else {
-								System.out.println("Não foi possivel enviar a mensagem, voltou para fila.");
-								message.setRetryCount(message.getRetryCount() + 1);
-								message.setErrorControl("naocopiado");
-								messages.add(0, message);
-							}
-							sendToken();
+					if (message.getNicknameDestination().equals(configuration.getNickname())) {
+						printMessage(message);
+						message.setErrorControl("ok");
+						sendMessageToClient(message.toString());
+					} else if (message.getNicknameDestination().equals(TODOS)
+							&& !message.getNicknameSource().equals(configuration.getNickname())
+							&& message.getErrorControl().equals(NAO_COPIADO)) {
+						System.out.println("A mensagem voltou para mim");
+						printMessage(message);
+						sendMessageToClient(message.toString());
+					} else if(!message.getNicknameDestination().equals(configuration.getNickname())) {
+						System.out.println("Recebi não para mim");
+						System.out.println(message.toString());
+						sendMessageToClient(message.toString());
+					} else if (message.getErrorControl().equals(OK)
+							|| message.getErrorControl().equals(NAO_COPIADO)) {
+						System.out.println("Foi entregue");
+						sendToken();
+					} else if (message.getErrorControl().equals(ERRO)){
+						if (message.getRetryCount() > 0) {
+							System.out.println("Não foi possivel enviar a mensagem " + message.toString());
+						} else {
+							System.out.println("Não foi possivel enviar a mensagem, voltou para fila. "
+									+ message.toString());
+							message.setRetryCount(message.getRetryCount() + 1);
+							message.setErrorControl(NAO_COPIADO);
+							messages.add(0, message);
 						}
+						sendToken();
 					}
 				}
 
