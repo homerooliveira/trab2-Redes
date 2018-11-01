@@ -19,8 +19,7 @@ public class Server {
 	public Server(Configuration configuration) {
 		this.configuration = configuration;
 
-		new Thread(this::lintenClients)
-				.start();
+		new Thread(this::lintenClients).start();
 
 		new Thread(() -> {
 			while (true) {
@@ -48,13 +47,12 @@ public class Server {
 				final DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 				serverSocket.receive(receivePacket);
 
-				final String receivedMessage = new String(
-						receivePacket.getData(),
-						receivePacket.getOffset(),
+				final String receivedMessage = new String(receivePacket.getData(), receivePacket.getOffset(),
 						receivePacket.getLength());
 
 				if (receivedMessage.equals("1234")) {
 					configuration.setHasToken(true);
+					System.out.println(configuration.getNickname() + ": Recebi o token.");
 					sendMessage();
 				} else {
 					final Message message = Message.from(receivedMessage);
@@ -62,20 +60,22 @@ public class Server {
 						System.out.println("Mensagem invalida " + receivedMessage);
 						continue;
 					}
-
-
 					// A mensagem é para mim
 					if (message.getNicknameDestination().equals(configuration.getNickname())) {
 						printMessage(message);
-						if (Math.random() <= ERROR_PROBABILITIY) {
-							message.setErrorControl(ERRO);
-						} else	 {
-							message.setErrorControl(OK);
-						}
-
+//						if (Math.random() <= ERROR_PROBABILITIY) {
+						message.setErrorControl(ERRO);
+						System.out.println("Error control: " + ERRO);
+//						} else	 {
+//							message.setErrorControl(OK);
+//							System.out.println("Error control: " + OK);
+//							if (message.getDataType() == 'A') {
+//								saveMessage(message);
+//							}
+//						}
 						sendMessageToClient(message.toString());
 					}
-					// A mensagem é para todos e não fui eu que enviei e codigo é naocopiado
+					// A mensagem é para todos e eu não sou a origem, controle de erro é: naocopiado
 					else if (message.getNicknameDestination().equals(TODOS)
 							&& !message.getNicknameSource().equals(configuration.getNickname())
 							&& message.getErrorControl().equals(NAO_COPIADO)) {
@@ -83,33 +83,31 @@ public class Server {
 						printMessage(message);
 						sendMessageToClient(message.toString());
 					}
-					// Mensagem não é para mim e o origem não sou eu
-					else if(!message.getNicknameDestination().equals(configuration.getNickname())
+					// A Mensagem não é para mim e eu não sou a origem.
+					else if (!message.getNicknameDestination().equals(configuration.getNickname())
 							&& !message.getNicknameSource().equals(configuration.getNickname())) {
-						System.out.println(configuration.getNickname()
-								+ " Recebi não é para mim"
-								+ message.toString());
+						System.out.println(configuration.getNickname() + ": Recebi uma mensagem e não é para mim.");
 						sendMessageToClient(message.toString());
 					}
-					// Fui eu que enviei a mensagem e estou recendo de volta
-					else if(message.getNicknameSource().equals(configuration.getNickname())) {
-						System.out.println("é para mim " + message.toString());
-						if (message.getErrorControl().equals(OK)
-								|| message.getErrorControl().equals(NAO_COPIADO)) {
-							System.out.println("Foi entregue " + message.toString());
-							sendToken();
-						} else if (message.getErrorControl().equals(ERRO)){
-							 if(errorMessage == message){ // Mensagem voltou pela segunda vez com erro, mensagem descartada
+					// Fui eu que enviei a mensagem e ela voltou para mim.
+					else if (message.getNicknameSource().equals(configuration.getNickname())) {
+						System.out.println("A mensagem voltou para mim.");
+						System.out.println("Error control: " + message.getErrorControl());
+						if (message.getErrorControl().equals(ERRO)) {
+							System.out.println("Não foi possível entregar a mensagem.");
+							if (errorMessage != null && errorMessage.equals(message)) {
+								// Mensagem voltou pela segunda vez com erro, mensagem descartada
 								errorMessage = null;
-							 	System.out.println("Não foi possivel enviar a mensagem " + message.toString());
-							 } else {
-								System.out.println("Não foi possivel enviar a mensagem, sera enviada mais uma vez assim que o token voltar. "
-										+ message.toString());
+								System.out.println("Mensagem descartada!");
+							}  else {
 								message.setErrorControl(NAO_COPIADO);
 								errorMessage = message;
-							 }
-							 sendToken();
+								System.out.println("A mensagem será enviada mais uma vez assim que o token voltar!");
+
+							}
+							sendToken();
 						}
+						sendToken();
 					}
 				}
 
@@ -122,51 +120,49 @@ public class Server {
 	}
 
 	private void sendToken() {
+		System.out.println(configuration.getNickname() + ": Enviando o token.");
 		configuration.setHasToken(false);
 		sendMessageToClient("1234");
 	}
 
 	private void printMessage(Message message) {
-		System.out.println("Source " + message.getNicknameSource());
-		System.out.println("Print "+ message);
+		System.out.println("--- Recebi uma mensagem ---");
+		System.out.println("Source: " + message.getNicknameSource());
+		System.out.println("Content: " + message.getContent());
+		System.out.println("---------------------------");
+	}
 
-		if (message.getDataType() == 'A') {
-			System.out.println("Salvando em um arquivo");
-			final String uuid = UUID.randomUUID().toString();
-			try (PrintWriter printWriter = new PrintWriter(new BufferedWriter(new FileWriter(uuid)), true)) {
-				printWriter.append(message.getContent());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			;
+	private void saveMessage(Message message) {
+		System.out.println("Salvando em um arquivo...");
+		final String uuid = UUID.randomUUID().toString();
+		try (PrintWriter printWriter = new PrintWriter(new BufferedWriter(new FileWriter(uuid)), true)) {
+			printWriter.append(message.getContent());
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
 	private void sendMessage() {
-		if (configuration.isHasToken() && !messages.isEmpty()) {
-			final Message remove;
-			if (errorMessage != null) {
-				remove = errorMessage;
-			} else {
-				remove = messages.remove(0);
-			}
-			sendMessageToClient(remove.toString());
+		if (errorMessage != null) {
+			System.out.println(configuration.getNickname() + ": Enviando mensagem.");
+			sendMessageToClient(errorMessage.toString());
+		} else if (!messages.isEmpty()) {
+			System.out.println(configuration.getNickname() + ": Enviando mensagem.");
+			sendMessageToClient(messages.remove(0).toString());
+		} else {
+			System.out.println("Não há mensagens para serem enviadas. Enviando o token para a maquina à direita.");
+			sendToken();
 		}
 	}
 
-
 	public void sendMessageToClient(String message) {
 		try {
-			try(DatagramSocket clientSocket = new DatagramSocket()) {
+			try (DatagramSocket clientSocket = new DatagramSocket()) {
 				InetAddress address = InetAddress.getByName(configuration.getIpDestiny());
 
 				byte[] sendData = message.getBytes();
-				DatagramPacket sendPacket = new DatagramPacket(
-						sendData,
-						sendData.length,
-						address,
+				DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, address,
 						configuration.getPortDestiny());
-				System.out.println("Enviando " + configuration.getNickname());
 				Thread.sleep((long) (1000 * configuration.getTokenTime()));
 				clientSocket.send(sendPacket);
 			} catch (InterruptedException e) {

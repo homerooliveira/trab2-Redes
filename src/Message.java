@@ -6,7 +6,6 @@ public class Message {
     private String nicknameDestination;
     private char dataType;
     private String content;
-    private int retryCount = 0;
 
     private Message(String errorControl, String nicknameSource, String nicknameDestination, char dataType, String content) {
         this.errorControl = errorControl;
@@ -46,14 +45,6 @@ public class Message {
         this.errorControl = errorControl;
     }
 
-    public void setRetryCount(int retryCount) {
-        this.retryCount = retryCount;
-    }
-
-    public int getRetryCount() {
-        return retryCount;
-    }
-
     public String getNicknameSource() {
         return nicknameSource;
     }
@@ -68,6 +59,22 @@ public class Message {
 
     public String getContent() {
         return content;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+    	if (obj instanceof Message) {
+//    		Message message = (Message) obj;
+//    		if (message.id == id &&
+//    				message.nicknameSource.equals(nicknameSource) &&
+//    				message.nicknameDestination.equals(nicknameDestination) &&
+//    				message.dataType == dataType &&
+//    				message.content.equals(content)) {
+//    			System.out.println("mensagem igual");
+//    			return true;
+//    		}
+    	}
+    	return false;
     }
 
     @Override
