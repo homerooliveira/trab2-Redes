@@ -1,9 +1,9 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Server {
 
@@ -72,7 +72,7 @@ public class Server {
 						} else	 {
 							message.setErrorControl(OK);
 						}
-						
+
 						sendMessageToClient(message.toString());
 					}
 					// A mensagem é para todos e não fui eu que enviei e codigo é naocopiado
@@ -131,8 +131,14 @@ public class Server {
 		System.out.println("Print "+ message);
 
 		if (message.getDataType() == 'A') {
-			//TODO: salvar o conteudo em um arquivo
 			System.out.println("Salvando em um arquivo");
+			final String uuid = UUID.randomUUID().toString();
+			try (PrintWriter printWriter = new PrintWriter(new BufferedWriter(new FileWriter(uuid)), true)) {
+				printWriter.append(message.getContent());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			;
 		}
 	}
 
