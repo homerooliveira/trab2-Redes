@@ -11,6 +11,7 @@ public class Server {
 	public static final String TODOS = "todos";
 	public static final String OK = "OK";
 	public static final String ERRO = "erro";
+	public static final double ERROR_PROBABILITIY = 0.3;
 	private final Configuration configuration;
 	private final List<Message> messages = Collections.synchronizedList(new ArrayList<>());
 	private Message errorMessage;
@@ -66,8 +67,12 @@ public class Server {
 					// A mensagem é para mim
 					if (message.getNicknameDestination().equals(configuration.getNickname())) {
 						printMessage(message);
-						message.setErrorControl(OK);
-						// TODO: Fazer o probalidade de ocorrer um erro
+						if (Math.random() <= ERROR_PROBABILITIY) {
+							message.setErrorControl(ERRO);
+						} else	 {
+							message.setErrorControl(OK);
+						}
+						
 						sendMessageToClient(message.toString());
 					}
 					// A mensagem é para todos e não fui eu que enviei e codigo é naocopiado
