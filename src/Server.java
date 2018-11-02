@@ -63,16 +63,16 @@ public class Server {
 					// A mensagem é para mim
 					if (message.getNicknameDestination().equals(configuration.getNickname())) {
 						printMessage(message);
-//						if (Math.random() <= ERROR_PROBABILITIY) {
-						message.setErrorControl(ERRO);
-						System.out.println("Error control: " + ERRO);
-//						} else	 {
-//							message.setErrorControl(OK);
-//							System.out.println("Error control: " + OK);
-//							if (message.getDataType() == 'A') {
-//								saveMessage(message);
-//							}
-//						}
+						if (Math.random() <= ERROR_PROBABILITIY) {
+							message.setErrorControl(ERRO);
+							System.out.println("Error control: " + ERRO);
+						} else {
+							message.setErrorControl(OK);
+							System.out.println("Error control: " + OK);
+							if (message.getDataType() == 'A') {
+								saveMessage(message);
+							}
+						}
 						sendMessageToClient(message.toString());
 					}
 					// A mensagem é para todos e eu não sou a origem, controle de erro é: naocopiado
@@ -105,7 +105,6 @@ public class Server {
 								System.out.println("A mensagem será enviada mais uma vez assim que o token voltar!");
 
 							}
-							sendToken();
 						}
 						sendToken();
 					}

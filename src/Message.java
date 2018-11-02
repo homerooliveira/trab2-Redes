@@ -64,15 +64,15 @@ public class Message {
     @Override
     public boolean equals(Object obj) {
     	if (obj instanceof Message) {
-//    		Message message = (Message) obj;
-//    		if (message.id == id &&
-//    				message.nicknameSource.equals(nicknameSource) &&
-//    				message.nicknameDestination.equals(nicknameDestination) &&
-//    				message.dataType == dataType &&
-//    				message.content.equals(content)) {
-//    			System.out.println("mensagem igual");
-//    			return true;
-//    		}
+    		Message message = (Message) obj;
+    		if (message.id == id &&
+    				message.nicknameSource.equals(nicknameSource) &&
+    				message.nicknameDestination.equals(nicknameDestination) &&
+    				message.dataType == dataType &&
+    				message.content.equals(content)) {
+    			System.out.println("mensagem igual");
+    			return true;
+    		}
     	}
     	return false;
     }
