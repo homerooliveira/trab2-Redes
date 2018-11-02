@@ -26,11 +26,11 @@ public class Server {
 				final Scanner scanner = new Scanner(System.in);
 				final String messageString = scanner.nextLine();
 				final Message message = Message.from(messageString);
-				if (messages.size() < 10) {
+				if (messages.size() < 10 && message != null) {
 					messages.add(message);
 					sendMessage();
 				} else {
-					System.out.println("Messagem perdida " + messageString);
+					System.out.println("Messagem perdida ou inválida" + messageString);
 				}
 			}
 		}).start();
@@ -105,6 +105,9 @@ public class Server {
 								System.out.println("A mensagem será enviada mais uma vez assim que o token voltar!");
 
 							}
+						}  else if (!message.getNicknameDestination().equals(TODOS)
+								&& message.getErrorControl().equals(NAO_COPIADO)){
+							System.out.println("Destino não encontrado e a mensagem foi descartada");
 						}
 						sendToken();
 					}
