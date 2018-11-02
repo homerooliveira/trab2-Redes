@@ -12,6 +12,7 @@ public class Server {
 	public static final String OK = "OK";
 	public static final String ERRO = "erro";
 	public static final double ERROR_PROBABILITIY = 0.3;
+	public static final String TOKEN = "1234";
 	private final Configuration configuration;
 	private final List<Message> messages = Collections.synchronizedList(new ArrayList<>());
 	private Message errorMessage;
@@ -50,11 +51,11 @@ public class Server {
 				final String receivedMessage = new String(receivePacket.getData(), receivePacket.getOffset(),
 						receivePacket.getLength());
 
-				if (receivedMessage.equals("1234")) {
+				if (receivedMessage.equals(TOKEN)) {
 					configuration.setHasToken(true);
 					System.out.println(configuration.getNickname() + ": Recebi o token.");
 					sendMessage();
-				} else {
+				} else { // Caso seja uma mensagem
 					final Message message = Message.from(receivedMessage);
 					if (message == null) {
 						System.out.println("Mensagem invalida " + receivedMessage);
@@ -69,6 +70,7 @@ public class Server {
 						} else {
 							message.setErrorControl(OK);
 							System.out.println("Error control: " + OK);
+							// Salva o conteúdo em um arquivo qualquer.
 							if (message.getDataType() == 'A') {
 								saveMessage(message);
 							}
@@ -125,7 +127,7 @@ public class Server {
 	private void sendToken() {
 		System.out.println(configuration.getNickname() + ": Enviando o token.");
 		configuration.setHasToken(false);
-		sendMessageToClient("1234");
+		sendMessageToClient(TOKEN);
 	}
 
 	private void printMessage(Message message) {
