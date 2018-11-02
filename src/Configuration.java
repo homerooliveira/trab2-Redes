@@ -59,6 +59,10 @@ public class Configuration {
         return debugPort;
     }
 
+    public boolean isDebug() {
+        return debugPort != -1;
+    }
+
     public void setDebugPort(int debugPort) {
         this.debugPort = debugPort;
     }

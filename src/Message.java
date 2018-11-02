@@ -65,8 +65,7 @@ public class Message {
     public boolean equals(Object obj) {
     	if (obj instanceof Message) {
     		Message message = (Message) obj;
-    		if (message.id == id &&
-    				message.nicknameSource.equals(nicknameSource) &&
+    		if (message.nicknameSource.equals(nicknameSource) &&
     				message.nicknameDestination.equals(nicknameDestination) &&
     				message.dataType == dataType &&
     				message.content.equals(content)) {

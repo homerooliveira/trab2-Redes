@@ -86,7 +86,8 @@ public class Server {
 					// A Mensagem não é para mim e eu não sou a origem.
 					else if (!message.getNicknameDestination().equals(configuration.getNickname())
 							&& !message.getNicknameSource().equals(configuration.getNickname())) {
-						System.out.println(configuration.getNickname() + ": Recebi uma mensagem e não é para mim.");
+						System.out.println(configuration.getNickname() + ": Recebi uma mensagem e não é para mim."
+								+ message.toString());
 						sendMessageToClient(message.toString());
 					}
 					// Fui eu que enviei a mensagem e ela voltou para mim.

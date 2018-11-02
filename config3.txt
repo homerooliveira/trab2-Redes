@@ -1,5 +1,5 @@
-localhost:6002
+localhost:6000
 Juca
 12
 false
-6000
+6002
