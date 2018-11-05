@@ -69,7 +69,6 @@ public class Message {
     				message.nicknameDestination.equals(nicknameDestination) &&
     				message.dataType == dataType &&
     				message.content.equals(content)) {
-    			System.out.println("mensagem igual");
     			return true;
     		}
     	}

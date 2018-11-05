@@ -10,7 +10,13 @@ public class ConfigurationReader {
             final String nickname = scanner.next();
             final double tokenTime = scanner.nextDouble();
             final boolean hasToken = scanner.nextBoolean();
-            final int debugPort = scanner.nextInt();
+            final int debugPort;
+            if (scanner.hasNextInt()) {
+                debugPort = scanner.nextInt();
+            } else {
+                debugPort = -1;
+            }
+
 
             return new Configuration(
                     ipAndPort[0],

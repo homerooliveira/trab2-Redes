@@ -13,6 +13,7 @@ public class Server {
 	public static final String ERRO = "erro";
 	public static final double ERROR_PROBABILITIY = 0.3;
 	public static final String TOKEN = "1234";
+	public static final int DEFAULT_PORT = 6000;
 	private final Configuration configuration;
 	private final List<Message> messages = Collections.synchronizedList(new ArrayList<>());
 	private Message errorMessage;
@@ -41,7 +42,12 @@ public class Server {
 	public void lintenClients() {
 		DatagramSocket serverSocket;
 		try {
-			serverSocket = new DatagramSocket(configuration.getDebugPort());
+			if (configuration.isDebug()) {
+				serverSocket = new DatagramSocket(configuration.getDebugPort());
+			} else {
+				serverSocket = new DatagramSocket(DEFAULT_PORT);
+			}
+
 			final byte[] receiveData = new byte[1024];
 
 			while (true) {
