@@ -4,6 +4,8 @@ import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class ConfigurationReader {
+	// Método utilizado para ler o arquivo de configuração de cada máquina,
+	// retornano um objeto configuração.
     public static Configuration read(String filename) throws IOException {
         try (Scanner scanner = new Scanner(Files.newBufferedReader(Paths.get(filename)))) {
             final String[] ipAndPort = scanner.next().split(":");
