@@ -24,7 +24,9 @@ public class Server {
 		new Thread(this::lintenClients).start();
 
 		new Thread(() -> {
+			System.out.println(configuration.toString());
 			while (true) {
+				System.out.println("Dígite uma mensagem. Exemplo: 2345;naocopiado:nome_da_origem:nome_do_destino:M:conteudo");
 				final Scanner scanner = new Scanner(System.in);
 				final String messageString = scanner.nextLine();
 				final Message message = Message.from(messageString);
