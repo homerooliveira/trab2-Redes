@@ -22,6 +22,10 @@ public class Message {
             return null;
         }
 
+        if (!values[0].equals("2345")) {
+            return null;
+        }
+
         final String[] newValues = values[1].split(":");
 
         if (newValues.length != 5) {
