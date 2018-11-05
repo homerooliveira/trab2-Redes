@@ -7,10 +7,10 @@ import java.util.*;
 
 public class Server {
 
-	public static final String NAO_COPIADO = "NAOCOPIADO";
+	public static final String NAO_COPIADO = "naocopiado";
 	public static final String TODOS = "TODOS";
 	public static final String OK = "OK";
-	public static final String ERRO = "ERRO";
+	public static final String ERRO = "erro";
 	public static final double ERROR_PROBABILITIY = 0.3;
 	public static final String TOKEN = "1234";
 	public static final int DEFAULT_PORT = 6000;
@@ -28,6 +28,7 @@ public class Server {
 		// Começa a ouvir o teclado esperando mensagens a serem enviadas.
 		new Thread(() -> {
 			System.out.println(configuration.toString());
+			sendToken();
 			while (true) {
 				System.out.println("Dígite uma mensagem. Exemplo: 2345;naocopiado:nome_da_origem:nome_do_destino:M:conteudo");
 				final Scanner scanner = new Scanner(System.in);
@@ -158,9 +159,11 @@ public class Server {
 
 	// Envia o TOKEN para a máquina a direita no anel de rede.
 	private void sendToken() {
-		System.out.println(configuration.getNickname() + ": Enviando o token.");
-		configuration.setHasToken(false);
-		sendMessageToClient(TOKEN);
+		if (configuration.isHasToken()) {
+			System.out.println(configuration.getNickname() + ": Enviando o token.");
+			configuration.setHasToken(false);
+			sendMessageToClient(TOKEN);
+		}
 	}
 
 	// Imprime a mensagem.
